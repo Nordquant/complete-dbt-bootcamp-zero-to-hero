@@ -18,7 +18,7 @@
 	"forwardPorts": [5000],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bash scripts/setup_codespace_env.sh",
+	"postStartCommand": "bash scripts/setup_codespace_env.sh",
 	"customizations": {
 		"vscode": {
 			"extensions": [
