@@ -1,5 +1,15 @@
 version: 2
 
+#################################################
+# 
+# Since dbt-core 1.8 tests are called data tests.
+#
+# you'll see the `data_tests` key in this file
+# but the `tests` key works equally well.
+#
+# Most of the course recording uses `tests`
+#
+#################################################
 models:
   - name: dim_listings_cleansed
     description: Cleansed table which contains Airbnb listings.
@@ -7,13 +17,13 @@ models:
 
       - name: listing_id
         description: Primary key for the listing
-        tests:
+        data_tests:
           - unique
           - not_null
 
       - name: host_id
         description: The hosts's id. References the host table.
-        tests:
+        data_tests:
           - not_null
           - relationships:
               to: ref('dim_hosts_cleansed')
@@ -21,7 +31,7 @@ models:
 
       - name: room_type
         description: Type of the apartment / room
-        tests:
+        data_tests:
           - accepted_values:
               values: ['Entire home/apt',
                       'Private room',
@@ -30,7 +40,7 @@ models:
 
       - name: minimum_nights
         description: '{{ doc("dim_listing_cleansed__minimum_nights") }}'
-        tests:
+        data_tests:
           - positive_value
 
   - name: dim_hosts_cleansed
@@ -38,28 +48,28 @@ models:
     columns:
       - name: host_id
         description: The id of the host. This is the primary key.
-        tests:
+        data_tests:
           - not_null
           - unique
       
       - name: host_name
         description: The name of the host
-        tests:
+        data_tests:
           - not_null
       
       - name: is_superhost
         description: Defines whether the hosts is a superhost.
-        tests:
+        data_tests:
           - accepted_values:
               values: ['t', 'f']
 
   - name: dim_listings_w_hosts
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_equal_other_table:
           compare_model: source('airbnb', 'listings')
     columns:
       - name: price
-        tests:
+        data_tests:
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: number
           - dbt_expectations.expect_column_quantile_values_to_be_between:
@@ -74,16 +84,16 @@ models:
   - name: fct_reviews
     columns:
       - name: listing_id
-        tests:
+        data_tests:
           - relationships:
               to: ref('dim_listings_cleansed')
               field: listing_id
 
       - name: reviewer_name
-        tests:
+        data_tests:
           - not_null
       
       - name: review_sentiment
-        tests:
+        data_tests:
           - accepted_values:
               values: ['positive', 'neutral', 'negative']
